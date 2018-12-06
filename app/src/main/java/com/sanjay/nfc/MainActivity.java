@@ -8,26 +8,30 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.nfc.tech.MifareUltralight;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
 public static TextView text;
     private NfcAdapter nfcAdapter;
-
+    private TextToSpeech tts;
     PendingIntent pendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        text = (TextView) findViewById(R.id.text);
+        text = findViewById(R.id.text);
+        tts = new TextToSpeech(this, this);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         if (nfcAdapter == null) {
@@ -39,6 +43,27 @@ public static TextView text;
         pendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, this.getClass())
                         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+    }
+
+    @Override
+    public void onInit(int status) {
+
+        if (status == TextToSpeech.SUCCESS) {
+
+            int result = tts.setLanguage(Locale.US);
+
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            } else {
+
+                // speakOut();
+            }
+
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+
     }
     private String dumpTagData(Tag tag) {
         StringBuilder sb = new StringBuilder();
@@ -205,7 +230,7 @@ public static TextView text;
             } else {
                 byte[] empty = new byte[0];
                 byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
-                Tag tag = (Tag) intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+                Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 byte[] payload = dumpTagData(tag).getBytes();
                 NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, id, payload);
                 NdefMessage msg = new NdefMessage(new NdefRecord[] {record});
@@ -229,8 +254,13 @@ public static TextView text;
             String str = record.str();
             builder.append(str).append("\n");
         }
-
+        speakOut(builder.toString());
         text.setText(builder.toString());
     }
 
+    private void speakOut(String text) {
+
+
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+    }
 }
