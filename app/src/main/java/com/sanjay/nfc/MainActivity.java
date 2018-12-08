@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
-public static TextView text;
+    public TextView text;
     private NfcAdapter nfcAdapter;
     private TextToSpeech tts;
     PendingIntent pendingIntent;
@@ -33,7 +33,6 @@ public static TextView text;
         text = findViewById(R.id.text);
         tts = new TextToSpeech(this, this);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-
         if (nfcAdapter == null) {
             Toast.makeText(this, "No NFC", Toast.LENGTH_SHORT).show();
             finish();
@@ -191,7 +190,6 @@ public static TextView text;
     @Override
     protected void onResume() {
         super.onResume();
-
         if (nfcAdapter != null) {
             if (!nfcAdapter.isEnabled())
                 showWirelessSettings();
