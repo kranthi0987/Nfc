@@ -11,7 +11,8 @@
         android:layout_height="150dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:src="@drawable/nfc" />
+        android:src="@mipmap/ic_launcher" />
+
 
     <TextView
         android:id="@+id/text"
