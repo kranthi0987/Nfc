@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.NFC" />
     <uses-feature android:name="android.hardware.nfc" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
 
     <application
         android:allowBackup="true"
@@ -20,7 +22,7 @@
             </intent-filter>
             <!-- Handle notes detected from outside our application -->
             <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <!--<action android:name="android.nfc.action.NDEF_DISCOVERED" />-->
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>

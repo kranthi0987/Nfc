@@ -1,6 +1,7 @@
 package com.sanjay.nfc;
 
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -10,10 +11,12 @@ import android.nfc.tech.MifareClassic;
 import android.nfc.tech.MifareUltralight;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         text = findViewById(R.id.text);
         tts = new TextToSpeech(this, this);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -200,6 +205,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         // Sticky notes received from Android
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
             NdefMessage[] messages = getNdefMessages(getIntent());
+            Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            vb.vibrate(100);
             displayMsgs(messages);
             setIntent(new Intent()); // Consume this intent.
         }
@@ -296,5 +303,18 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             finish();
         }
         return msgs;
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            vb.vibrate(100);
+            return true;
+        }
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            return true;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
     }
 }
