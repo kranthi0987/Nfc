@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.sanjay.nfc">
 
     <uses-permission android:name="android.permission.NFC" />
@@ -9,11 +10,13 @@
 
     <application
         android:allowBackup="true"
+        android:name=".MyApp"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,10 +27,24 @@
             <intent-filter>
                 <!--<action android:name="android.nfc.action.NDEF_DISCOVERED" />-->
                 <category android:name="android.intent.category.DEFAULT" />
+
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
+
+
         </activity>
-        <service android:name=".TTSService"></service>
+        <receiver
+            android:name=".MediaButtonIntentReciever"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.media.VOLUME_CHANGED_ACTION" />
+                <action android:name="LOCK_SCREEN_ACTION_INTENT" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".Backgroundservice" />
     </application>
 
 </manifest>

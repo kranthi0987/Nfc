@@ -1,8 +1,10 @@
 package com.sanjay.nfc;
 
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -14,6 +16,7 @@ import android.os.Parcelable;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,12 +32,27 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private TextToSpeech tts;
     PendingIntent pendingIntent;
 
+    private Object MyIntentService;
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(MyIntentService.BROADCAST_ACTION_BAZ)) {
+                final String param = intent.getStringExtra(EXTRA_PARAM_B);
+                // do something
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(MyIntentService.BROADCAST_ACTION_BAZ);
+        LocalBroadcastManager bm = LocalBroadcastManager.getInstance(this);
+        bm.registerReceiver(mBroadcastReceiver, filter);
+        
         text = findViewById(R.id.text);
         tts = new TextToSpeech(this, this);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
