@@ -1,6 +1,8 @@
 package com.sanjay.nfc;
 
 import android.app.PendingIntent;
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,11 +14,11 @@ import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.nfc.tech.MifareUltralight;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -31,28 +33,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private NfcAdapter nfcAdapter;
     private TextToSpeech tts;
     PendingIntent pendingIntent;
-
+    int i = 0;
     private Object MyIntentService;
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(MyIntentService.BROADCAST_ACTION_BAZ)) {
-                final String param = intent.getStringExtra(EXTRA_PARAM_B);
-                // do something
-            }
-        }
-    };
+    private BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(MyIntentService.BROADCAST_ACTION_BAZ);
-        LocalBroadcastManager bm = LocalBroadcastManager.getInstance(this);
-        bm.registerReceiver(mBroadcastReceiver, filter);
-        
         text = findViewById(R.id.text);
         tts = new TextToSpeech(this, this);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -62,10 +51,25 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             return;
         }
 
+
         pendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, this.getClass())
                         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        // your oncreate code should be
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("Volume");
+        filter.addAction("SOME_OTHER_ACTION");
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //do something based on the intent's action
+            }
+        };
+        registerReceiver(receiver, filter);
     }
+
 
     @Override
     public void onInit(int status) {
@@ -325,8 +329,22 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            vb.vibrate(100);
+            i++;
+            Handler handler = new Handler();
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    i = 0;
+                }
+            };
+            if (i == 1) {
+                Toast.makeText(getApplicationContext(), "single click", Toast.LENGTH_SHORT).show();
+                handler.postDelayed(runnable, 400);
+            } else if (i == 2) {
+                Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                vb.vibrate(100);
+            }
+
             return true;
         }
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
@@ -334,5 +352,18 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         } else {
             return super.onKeyDown(keyCode, event);
         }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    private void onAppBackgrounded() {
+        Log.d("MyApp", "App in background");
+
+        Toast.makeText(getApplicationContext(), "background", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    private void onAppForegrounded() {
+        Log.d("MyApp", "App in foreground");
     }
 }

@@ -18,8 +18,7 @@ public class Backgroundservice extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Intent notificationIntent = new Intent(getApplicationContext(), MediaButtonIntentReciever.class);
-        startActivity(notificationIntent);
+
         // Keep the WIFI turned on.
         return Service.START_STICKY;
     }
