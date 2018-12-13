@@ -6,7 +6,6 @@ import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -55,19 +54,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         pendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, this.getClass())
                         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        // your oncreate code should be
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("Volume");
-        filter.addAction("SOME_OTHER_ACTION");
-
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                //do something based on the intent's action
-            }
-        };
-        registerReceiver(receiver, filter);
     }
 
 

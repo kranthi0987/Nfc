@@ -35,9 +35,7 @@
 
         </activity>
         <receiver android:name=".VolumeBroadcast" />
-        <intent-filter>
-            <action android:name="android.intent.action.MEDIA_BUTTON" />
-        </intent-filter>
+
         <service android:name=".Backgroundservice" />
     </application>
 
