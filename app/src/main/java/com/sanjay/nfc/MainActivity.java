@@ -24,10 +24,13 @@ import android.view.KeyEvent;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sanjay.nfc.shaker.Shaker;
+
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, Shaker.Callback {
+
     public TextView text;
     private NfcAdapter nfcAdapter;
     private TextToSpeech tts;
@@ -35,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     int i = 0;
     private Object MyIntentService;
     private BroadcastReceiver receiver;
-
+    private Shaker shaker = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         text = findViewById(R.id.text);
         tts = new TextToSpeech(this, this);
+        shaker = new Shaker(this, 1.25d, 500, this);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null) {
             Toast.makeText(this, "No NFC", Toast.LENGTH_SHORT).show();
@@ -352,5 +356,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     private void onAppForegrounded() {
         Log.d("MyApp", "App in foreground");
+    }
+
+    public void shakingStarted() {
+        Log.d("ShakerDemo", "Shaking started!");
+
+    }
+
+    public void shakingStopped() {
+        Log.d("ShakerDemo", "Shaking stopped!");
+
     }
 }

@@ -37,6 +37,19 @@
         <receiver android:name=".VolumeBroadcast" />
 
         <service android:name=".Backgroundservice" />
+        <service android:name=".shaker.ShakeService" />
+
+        <receiver android:name=".shaker.BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".Camera.camera">
+            <intent-filter android:priority="10000">
+                <action android:name="android.intent.action.CAMERA_BUTTON" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
