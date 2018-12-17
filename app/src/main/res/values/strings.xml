@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_name">ClothingEye</string>
-    <string name="hold_a_tag_against_the_back_of_your_device">Step 1:- Shake the device to get open the application \n Step 2:-scan the NFC tag for read the Tag</string>
+    <string name="app_name">Apparel Vision</string>
+    <string name="step1">Step 1</string>
+    <string name="step2">Step 2</string>
+    <string name="hold_a_tag_against_the_back_of_your_device"> Shake your mobile to open the app</string>
+    <string name="scan"> Scan any NFC Tag to read it aloud</string>
 </resources>

@@ -1,8 +1,6 @@
 package com.sanjay.nfc;
 
 import android.app.PendingIntent;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +21,7 @@ import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private Sensor mAccelerometer;
     private ShakeDetector mShakeDetector;
 
-    public TextView text;
+    public TextView text, t1, t2, t3, t4;
     private NfcAdapter nfcAdapter;
     private TextToSpeech tts;
     PendingIntent pendingIntent;
@@ -51,6 +50,16 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         setContentView(R.layout.activity_main);
 
         text = findViewById(R.id.text);
+        t1 = findViewById(R.id.textView2);
+        t2 = findViewById(R.id.textView3);
+        t3 = findViewById(R.id.textView5);
+        t4 = findViewById(R.id.textView6);
+
+        text.setVisibility(View.INVISIBLE);
+        t1.setVisibility(View.VISIBLE);
+        t2.setVisibility(View.VISIBLE);
+        t3.setVisibility(View.VISIBLE);
+        t4.setVisibility(View.VISIBLE);
         tts = new TextToSpeech(this, this);
         Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vb.vibrate(100);
@@ -98,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         Intent myIntent = new Intent(this, MainActivity.class);
         myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(myIntent);
-
+        MyApp.onAppForegrounded();
         Log.d("ggggg", "handleShakeEvent:" + count);
     }
 
@@ -249,6 +258,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @Override
     protected void onResume() {
         super.onResume();
+        text.setVisibility(View.INVISIBLE);
+
         if (nfcAdapter != null) {
             if (!nfcAdapter.isEnabled())
                 showWirelessSettings();
@@ -261,6 +272,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             NdefMessage[] messages = getNdefMessages(getIntent());
             Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             vb.vibrate(100);
+            text.setVisibility(View.VISIBLE);
+            t1.setVisibility(View.INVISIBLE);
+            t2.setVisibility(View.INVISIBLE);
+            t3.setVisibility(View.INVISIBLE);
+            t4.setVisibility(View.INVISIBLE);
             displayMsgs(messages);
             setIntent(new Intent()); // Consume this intent.
         }
@@ -410,19 +426,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         return super.onKeyDown(keyCode, event);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    private void onAppBackgrounded() {
-        Log.d("MyApp", "App in background");
 
-        Toast.makeText(getApplicationContext(), "background", Toast.LENGTH_SHORT).show();
-
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    private void onAppForegrounded() {
-
-        Log.d("MyApp", "App in foreground");
-    }
 
 
 }
