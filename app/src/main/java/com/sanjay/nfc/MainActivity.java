@@ -31,8 +31,6 @@ import com.sanjay.nfc.shaker.ShakeDetector;
 import java.util.List;
 import java.util.Locale;
 
-import static android.content.Intent.FLAG_ACTIVITY_MULTIPLE_TASK;
-
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     // The following are used for the shake detection
     private SensorManager mSensorManager;
@@ -91,15 +89,16 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @Override
     public void onBackPressed() {
-        moveTaskToBack(true);
+        //  moveTaskToBack(true);
 // dont call **super**, if u want disable back button in current screen.
     }
 
     private void handleShakeEvent(int count) {
         //onKeyDown()
         Intent myIntent = new Intent(this, MainActivity.class);
-        myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_MULTIPLE_TASK);
+        myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(myIntent);
+
         Log.d("ggggg", "handleShakeEvent:" + count);
     }
 
@@ -379,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 Intent myIntent = new Intent(this, MainActivity.class);
                 startActivity(myIntent);
                 Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                vb.vibrate(100);
+                vb.vibrate(200);
             }
 
             return true;
