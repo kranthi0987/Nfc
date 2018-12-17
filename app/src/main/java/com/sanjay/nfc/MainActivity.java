@@ -6,6 +6,8 @@ import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -24,12 +26,18 @@ import android.view.KeyEvent;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sanjay.nfc.shaker.Shaker;
+import com.sanjay.nfc.shaker.ShakeDetector;
 
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, Shaker.Callback {
+import static android.content.Intent.FLAG_ACTIVITY_MULTIPLE_TASK;
+
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
+    // The following are used for the shake detection
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private ShakeDetector mShakeDetector;
 
     public TextView text;
     private NfcAdapter nfcAdapter;
@@ -38,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     int i = 0;
     private Object MyIntentService;
     private BroadcastReceiver receiver;
-    private Shaker shaker = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +54,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         text = findViewById(R.id.text);
         tts = new TextToSpeech(this, this);
-        shaker = new Shaker(this, 1.25d, 500, this);
+        Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vb.vibrate(100);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null) {
             Toast.makeText(this, "No NFC", Toast.LENGTH_SHORT).show();
@@ -59,6 +68,39 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 new Intent(this, this.getClass())
                         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
+        // ShakeDetector initialization
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mShakeDetector = new ShakeDetector();
+        mShakeDetector.setOnShakeListener(new ShakeDetector.OnShakeListener() {
+
+            @Override
+            public void onShake(int count) {
+                /*
+                 * The following method, "handleShakeEvent(count):" is a stub //
+                 * method you would use to setup whatever you want done once the
+                 * device has been shook.
+                 */
+
+                Log.d("sakng", "onShake: ");
+                handleShakeEvent(count);
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+// dont call **super**, if u want disable back button in current screen.
+    }
+
+    private void handleShakeEvent(int count) {
+        //onKeyDown()
+        Intent myIntent = new Intent(this, MainActivity.class);
+        myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_MULTIPLE_TASK);
+        startActivity(myIntent);
+        Log.d("ggggg", "handleShakeEvent:" + count);
     }
 
 
@@ -223,6 +265,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             displayMsgs(messages);
             setIntent(new Intent()); // Consume this intent.
         }
+        // Add the following line to register the Session Manager Listener onResume
+        mSensorManager.registerListener(mShakeDetector, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
     private void showWirelessSettings() {
@@ -332,6 +376,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 Toast.makeText(getApplicationContext(), "single click", Toast.LENGTH_SHORT).show();
                 handler.postDelayed(runnable, 400);
             } else if (i == 2) {
+                Intent myIntent = new Intent(this, MainActivity.class);
+                startActivity(myIntent);
                 Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vb.vibrate(100);
             }
@@ -340,9 +386,29 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             return true;
-        } else {
-            return super.onKeyDown(keyCode, event);
         }
+        if (keyCode == KeyEvent.KEYCODE_POWER) {
+            i++;
+            Handler handler = new Handler();
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    i = 0;
+                }
+            };
+            if (i == 1) {
+                Toast.makeText(getApplicationContext(), "single click", Toast.LENGTH_SHORT).show();
+                handler.postDelayed(runnable, 400);
+            } else if (i == 2) {
+                Intent myIntent = new Intent(this, MainActivity.class);
+                startActivity(myIntent);
+                Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                vb.vibrate(100);
+            }
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
@@ -355,16 +421,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     private void onAppForegrounded() {
+
         Log.d("MyApp", "App in foreground");
     }
 
-    public void shakingStarted() {
-        Log.d("ShakerDemo", "Shaking started!");
 
-    }
-
-    public void shakingStopped() {
-        Log.d("ShakerDemo", "Shaking stopped!");
-
-    }
 }

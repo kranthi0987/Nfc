@@ -25,19 +25,21 @@
         android:src="@drawable/nfc" />
 
 
-    <TextView
+    <Textview
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="Hold a tag against the back of your device"
+        android:layout_below="@id/logo"
         android:textStyle="bold"
         android:textSize="20sp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="50dp"
         android:gravity="center_horizontal"
-        android:layout_below="@id/logo"/>
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:text="@string/hold_a_tag_against_the_back_of_your_device" />
 
     <!--<EditText-->
     <!--android:id="@+id/editText"-->

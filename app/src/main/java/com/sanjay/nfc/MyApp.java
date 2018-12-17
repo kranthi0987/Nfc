@@ -9,6 +9,7 @@ public class MyApp extends Application implements LifecycleObserver {
     @Override
     public void onCreate() {
         super.onCreate();
+
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
     }
 
